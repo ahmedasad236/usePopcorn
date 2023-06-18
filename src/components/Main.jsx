@@ -1,13 +1,5 @@
-import MoviesBox from './MoviesBox';
-import WatchedBox from './WatchedBox';
-
-function Main() {
-  return (
-    <main className="main">
-      <MoviesBox />
-      <WatchedBox />
-    </main>
-  );
+function Main({ children }) {
+  return <main className="main">{children}</main>;
 }
 
 export default Main;
