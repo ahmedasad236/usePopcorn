@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import CollapseButton from './CollapseButton';
-import MovieList from './MovieList';
 
-function MoviesBox({ children }) {
+function CollapsedBox({ children }) {
   const [isOpen, setIsOpen] = useState(true);
 
   return (
@@ -16,4 +15,4 @@ function MoviesBox({ children }) {
   );
 }
 
-export default MoviesBox;
+export default CollapsedBox;
