@@ -1,8 +1,8 @@
 import React from 'react';
 
-function MovieItem({ movie }) {
+function MovieItem({ movie, onSelectMovie }) {
   return (
-    <li>
+    <li onClick={() => onSelectMovie(movie.imdbID)}>
       <img
         src={movie.Poster}
         alt={`${movie.Title} poster`}

@@ -10,6 +10,8 @@ import WatchedSummary from './components/WatchedSummary';
 import WatchedList from './components/WatchedList';
 import Loader from './components/Loader';
 import ErrorMessage from './components/ErrorMessage';
+import SelectedMovie from './components/SelectedMovie';
+import fetchMoviesBySearch from './api/fetchMovies';
 
 const tempMovieData = [
   {
@@ -62,35 +64,43 @@ const KEY = 'f84fc31d';
 
 export default function App() {
   const [movies, setMovies] = useState([]);
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [watched, setWatched] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [query, setQuery] = useState('');
+  const [selectedId, setSelectedId] = useState(null);
 
+  const handleSelectMovie = (id) => {
+    setSelectedId((selectedId) => (id === selectedId ? null : id));
+  };
+
+  const handleCloseMovie = () => {
+    setSelectedId(null);
+  };
+
+  const handleAddWatched = (movie) => {
+    setWatched((prevMovies) => [...prevMovies, movie]);
+  };
+
+  const handleDeleteWatched = (id) => {
+    setWatched((prevMovies) =>
+      prevMovies.filter((movie) => movie.imdbID !== id)
+    );
+  };
   useEffect(
     function () {
       async function getMovies() {
         setIsLoading(true);
         setError('');
-        try {
-          const response = await fetch(
-            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-          );
 
-          if (!response.ok)
-            throw new Error('Something went wrong with fetching movies');
+        const response = await fetchMoviesBySearch(query);
 
-          const data = await response.json();
+        if (response.status === 'failed') setError(response.data);
+        else if (response.data.Response === 'False')
+          setError('Movie not found');
+        else if (response.status === 'success') setMovies(response.data.Search);
 
-          if (data.Response === 'False') throw new Error('Movie not found');
-
-          setMovies(data.Search);
-        } catch (err) {
-          console.log(err);
-          setError(err.message);
-        } finally {
-          setIsLoading(false);
-        }
+        setIsLoading(false);
       }
 
       if (query.length < 2) {
@@ -117,11 +127,30 @@ export default function App() {
         <CollapsedBox>
           {isLoading && <Loader />}
           {error && <ErrorMessage message={error} />}
-          {!isLoading && !error && <MovieList movies={movies} />}
+          {!isLoading && !error && (
+            <MovieList
+              onSelectMovie={handleSelectMovie}
+              movies={movies}
+            />
+          )}
         </CollapsedBox>
         <CollapsedBox>
-          <WatchedSummary watched={watched} />
-          <WatchedList watched={watched} />
+          {selectedId ? (
+            <SelectedMovie
+              watched={watched}
+              selectedId={selectedId}
+              onCloseMovie={handleCloseMovie}
+              onAddWatched={handleAddWatched}
+            />
+          ) : (
+            <>
+              <WatchedSummary watched={watched} />
+              <WatchedList
+                watched={watched}
+                onDeleteWatched={handleDeleteWatched}
+              />
+            </>
+          )}
         </CollapsedBox>
       </Main>
     </>
