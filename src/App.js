@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import NavBar from './components/NavBar';
 import Main from './components/Main';
 import Logo from './components/Logo';
@@ -8,6 +8,8 @@ import MovieList from './components/MovieList';
 import CollapsedBox from './components/CollapsedBox';
 import WatchedSummary from './components/WatchedSummary';
 import WatchedList from './components/WatchedList';
+import Loader from './components/Loader';
+import ErrorMessage from './components/ErrorMessage';
 
 const tempMovieData = [
   {
@@ -56,19 +58,66 @@ const tempWatchedData = [
   }
 ];
 
+const KEY = 'f84fc31d';
+
 export default function App() {
-  const [movies, setMovies] = useState(tempMovieData);
+  const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(tempWatchedData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [query, setQuery] = useState('');
+
+  useEffect(
+    function () {
+      async function getMovies() {
+        setIsLoading(true);
+        setError('');
+        try {
+          const response = await fetch(
+            `http://www.omdbapi.com/?apikey=${KEY}&s=${query}`
+          );
+
+          if (!response.ok)
+            throw new Error('Something went wrong with fetching movies');
+
+          const data = await response.json();
+
+          if (data.Response === 'False') throw new Error('Movie not found');
+
+          setMovies(data.Search);
+        } catch (err) {
+          console.log(err);
+          setError(err.message);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+
+      if (query.length < 2) {
+        setMovies([]);
+        setError('');
+        return;
+      }
+      getMovies();
+    },
+    [query]
+  );
+
   return (
     <>
       <NavBar>
         <Logo />
-        <Search />
+        <Search
+          query={query}
+          handleQueryChange={setQuery}
+        />
         <ResultsCount movies={movies} />
       </NavBar>
       <Main>
         <CollapsedBox>
-          <MovieList movies={movies} />
+          {isLoading && <Loader />}
+          {error && <ErrorMessage message={error} />}
+          {!isLoading && !error && <MovieList movies={movies} />}
         </CollapsedBox>
         <CollapsedBox>
           <WatchedSummary watched={watched} />
