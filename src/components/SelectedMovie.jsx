@@ -27,6 +27,8 @@ function SelectedMovie({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const watchedUserRating = watched.find(
     (movie) => movie.imdbID === selectedId
   )?.userRating;
+
+  // Effect to get the data of the movie from the API whenever the movie Id changes
   useEffect(
     function () {
       const getMovieData = async () => {
@@ -46,6 +48,14 @@ function SelectedMovie({ selectedId, onCloseMovie, onAddWatched, watched }) {
     [selectedId]
   );
 
+  // Effect to change the title of the page whenever the title changes
+  useEffect(() => {
+    if (!title) return;
+    document.title = `Movie | ${title}`;
+
+    // cleanup function to reset the title of the page when the component is unmounted
+    return () => (document.title = 'usePopcorn');
+  }, [title]);
   const handleAdd = () => {
     const newWatchedMovie = {
       imdbID: selectedId,
