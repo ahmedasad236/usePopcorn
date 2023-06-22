@@ -56,6 +56,21 @@ function SelectedMovie({ selectedId, onCloseMovie, onAddWatched, watched }) {
     // cleanup function to reset the title of the page when the component is unmounted
     return () => (document.title = 'usePopcorn');
   }, [title]);
+
+  // Effect when keypress
+  useEffect(
+    function () {
+      function callback(e) {
+        if (e.code === 'Escape' || e.code === 'Backspace') onCloseMovie();
+      }
+
+      document.addEventListener('keydown', callback);
+
+      return () => document.removeEventListener('keydown', callback);
+    },
+    [onCloseMovie]
+  );
+
   const handleAdd = () => {
     const newWatchedMovie = {
       imdbID: selectedId,

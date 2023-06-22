@@ -1,8 +1,10 @@
 import { BASE_URL } from './api';
 
-export default async function fetchMoviesBySearch(searchQuery) {
+export default async function fetchMoviesBySearch(searchQuery, controller) {
   try {
-    const response = await fetch(`${BASE_URL}s=${searchQuery}`);
+    const response = await fetch(`${BASE_URL}s=${searchQuery}`, {
+      signal: controller.signal
+    });
     if (!response.ok)
       throw new Error('Something went wrong with fetching movies');
     const data = await response.json();
@@ -10,6 +12,8 @@ export default async function fetchMoviesBySearch(searchQuery) {
     return { data, status: 'success' };
   } catch (err) {
     console.log(err.message);
+    if (err.name === 'AbortError')
+      return { data: err.message, status: 'abortError' };
     return { data: err.message, status: 'failed' };
   }
 }

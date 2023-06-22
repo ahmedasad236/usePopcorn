@@ -89,11 +89,13 @@ export default function App() {
   };
   useEffect(
     function () {
+      const controller = new AbortController();
+
       async function getMovies() {
         setIsLoading(true);
         setError('');
 
-        const response = await fetchMoviesBySearch(query);
+        const response = await fetchMoviesBySearch(query, controller);
 
         if (response.status === 'failed') setError(response.data);
         else if (response.data.Response === 'False')
@@ -108,6 +110,7 @@ export default function App() {
         setError('');
         return;
       }
+      handleCloseMovie();
       getMovies();
     },
     [query]
