@@ -35,7 +35,6 @@ function StarRating({
   const [tempRating, setTempRating] = useState(0);
 
   const handleRating = (rate) => {
-    console.log('rating is set');
     setRating(rate);
     onSetRating(rate);
   };

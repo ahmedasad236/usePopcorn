@@ -11,7 +11,6 @@ export default async function fetchMoviesBySearch(searchQuery, controller) {
 
     return { data, status: 'success' };
   } catch (err) {
-    console.log(err.message);
     if (err.name === 'AbortError')
       return { data: err.message, status: 'abortError' };
     return { data: err.message, status: 'failed' };

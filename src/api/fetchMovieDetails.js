@@ -9,7 +9,6 @@ export default async function fetchMovieDetails(movieId) {
 
     return { data, status: 'success' };
   } catch (err) {
-    console.log(err.message);
     return { data: err.message, status: 'failed' };
   }
 }
