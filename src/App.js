@@ -16,7 +16,9 @@ import fetchMoviesBySearch from './api/fetchMovies';
 export default function App() {
   const [movies, setMovies] = useState([]);
   const [watched, setWatched] = useState(() =>
-    JSON.parse(localStorage.getItem('watched'))
+    JSON.parse(
+      localStorage.getItem('watched') ? localStorage.getItem('watched') : '[]'
+    )
   );
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
