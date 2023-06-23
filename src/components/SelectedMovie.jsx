@@ -4,6 +4,7 @@ import fetchMovieDetails from '../api/fetchMovieDetails';
 import { useState } from 'react';
 import StarRating from './StarRating';
 import Loader from './Loader';
+import { useKey } from '../hooks/useKey';
 
 function SelectedMovie({ selectedId, onCloseMovie, onAddWatched, watched }) {
   const [movie, setMovie] = useState({});
@@ -58,18 +59,7 @@ function SelectedMovie({ selectedId, onCloseMovie, onAddWatched, watched }) {
   }, [title]);
 
   // Effect when keypress
-  useEffect(
-    function () {
-      function callback(e) {
-        if (e.code === 'Escape' || e.code === 'Backspace') onCloseMovie();
-      }
-
-      document.addEventListener('keydown', callback);
-
-      return () => document.removeEventListener('keydown', callback);
-    },
-    [onCloseMovie]
-  );
+  useKey('Escape', onCloseMovie);
 
   const handleAdd = () => {
     const newWatchedMovie = {
